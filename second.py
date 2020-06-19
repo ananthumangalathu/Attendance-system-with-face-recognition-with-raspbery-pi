@@ -5,8 +5,10 @@ import os
 import cv2 as cv
 import mysql.connector
 import csv
+import numpy as np
+from PIL import Image, ImageTk
 
-mydb=mysql.connector.connect(host="127.0.0.1",port="3306",user="root",passwd="Sarath@1998",database="mine")
+mydb=mysql.connector.connect(host="127.0.0.1",port="3306",user="root",passwd="Sarath@1998",database="student_database")
 mycursor=mydb.cursor()
 
 
@@ -71,7 +73,7 @@ def add_new():
             writer.writerow(["Id","Name","Email"])
             writer.writerows(data)
         f.close()
-        message.configure(text= res)
+        
     else:
         if(is_number(Id)):
             res = "Enter Alphabetical Name"
@@ -80,7 +82,40 @@ def add_new():
             res = "Enter Numeric Id"
             message.configure(text= res)
 
+def TrainImages():
+    recognizer = cv.face_LBPHFaceRecognizer.create()#recognizer = cv2.face.LBPHFaceRecognizer_create()#$cv2.createLBPHFaceRecognizer()
+    harcascadePath = "haarcascade_frontalface_default.xml"
+    detector =cv.CascadeClassifier(harcascadePath)
+    faces,Id = getImagesAndLabels("Images")
+    recognizer.train(faces, np.array(Id))
+    recognizer.save("ImageLabel\Trainner.yml")
+    res = "Image Trained"#+",".join(str(f) for f in Id)
+    
+
+def getImagesAndLabels(path):
+    #get the path of all the files in the folder
+    imagePaths=[os.path.join(path,f) for f in os.listdir(path)] 
+    #print(imagePaths)
+    
+    #create empth face list
+    faces=[]
+    #create empty ID list
+    Ids=[]
+    #now looping through all the image paths and loading the Ids and the images
+    for imagePath in imagePaths:
+        #loading the image and converting it to gray scale
+        pilImage=Image.open(imagePath).convert('L')
+        #Now we are converting the PIL image into numpy array
+        imageNp=np.array(pilImage,'uint8')
+        #getting the Id from the image
+        Id=int(os.path.split(imagePath)[-1].split(".")[1])
+        # extract the face from the training image sample
+        faces.append(imageNp)
+        Ids.append(Id)        
+    return faces,Ids
+
 def quit():
+    TrainImages()
     root.destroy()
 
 label1=tk.Label(root,text="Password",width=8,fg="white",bg="red",font=('times',20,'bold'))
@@ -109,7 +144,7 @@ button1.place(x=500,y=50)
 button2=tk.Button(root,text="Quit",command=quit,width=8,fg="white",bg="red",font=('times',20,'bold'))
 button2.place(x=500,y=150)
 
-button3=tk.Button(root,text="Add New",width=8,fg="white",bg="red",font=('times',20,'bold'))
+button3=tk.Button(root,text="Add New",command=add_new,width=8,fg="white",bg="red",font=('times',20,'bold'))
 button3.place(x=100,y=300)
 
 button4=tk.Button(root,text="Delete",width=8,fg="white",bg="red",font=('times',20,'bold'))
