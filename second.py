@@ -46,14 +46,12 @@ def is_number(s):
         return True
     except ValueError:
         pass
- 
     try:
         import unicodedata
         unicodedata.numeric(s)
         return True
     except (TypeError, ValueError):
         pass
- 
     return False
 
 def add_new():
@@ -85,7 +83,6 @@ def add_new():
                 break
         cam.release()
         cv.destroyAllWindows() 
-        res = "Images Saved for ID : " + Id +" Name : "+ Name
         row = (Id, Name,Email)
         sql="INSERT INTO student_database (Id,Name,Email) VALUES (%s,%s,%s)"
         mycursor.execute(sql,row)
@@ -97,14 +94,12 @@ def add_new():
             writer.writerow(["Id","Name","Email"])
             writer.writerows(data)
         f.close()
-        message1.configure(text= res)
+        message1.configure(text="Images Saved for ID : " + Id +" Name : "+ Name)
     else:
         if(is_number(Id)):
-            res = "Enter Alphabetical Name"
-            message1.configure(text= res)
+            message1.configure(text="Enter Alphabetical Name")
         if(Name.isalpha()):
-            res = "Enter Numeric Id"
-            message1.configure(text= res)
+            message1.configure(text="Enter Numeric Id")
 
 def TrainImages():
     recognizer = cv.face_LBPHFaceRecognizer.create()#recognizer = cv2.face.LBPHFaceRecognizer_create()#$cv2.createLBPHFaceRecognizer()
@@ -113,8 +108,7 @@ def TrainImages():
     faces,Id = getImagesAndLabels("Images")
     recognizer.train(faces, np.array(Id))
     recognizer.save("ImageLabel\Trainner.yml")
-    res = "Image Trained"#+",".join(str(f) for f in Id)
-    message1.configure(text="Image Trained")
+    message1.configure(text="Trainning compleated")
     
 
 def getImagesAndLabels(path):
@@ -149,6 +143,24 @@ def clear():
     text3.delete(0, 'end')
     text4.delete(0, 'end')
     
+def delete():
+    Id=(text2.get())
+    Name=(text3.get())
+    samplenum=1
+    while (samplenum<=61):
+        os.remove("Images/ "+Name +"."+Id +'.'+ str(samplenum) + ".jpg")
+        samplenum=samplenum+1
+    sql = "DELETE FROM student_database WHERE Id=Id"
+    mycursor.execute(sql)
+    mydb.commit()
+    mycursor.execute("SELECT * FROM student_database")
+    data=mycursor.fetchall()
+    with open('StudentDetails\StudentDetails.csv','w') as f:
+        writer = csv.writer(f, delimiter=',')
+        writer.writerow(["Id","Name","Email"])
+        writer.writerows(data)
+    f.close()
+    message1.configure(text="Deleted "+Name+" "+Id)
 
 
 
@@ -162,6 +174,6 @@ button2.place(x=500,y=275)
 button3=tk.Button(root,text="Add New",command=add_new,width=8,fg="white",bg="red",font=('times',20,'bold'))
 button3.place(x=500,y=50)
 
-button4=tk.Button(root,text="Delete",width=8,fg="white",bg="red",font=('times',20,'bold'))
+button4=tk.Button(root,text="Delete",command=delete,width=8,fg="white",bg="red",font=('times',20,'bold'))
 button4.place(x=500,y=125)
 root.mainloop()
