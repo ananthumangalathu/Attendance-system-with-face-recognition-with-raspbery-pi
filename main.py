@@ -1,11 +1,14 @@
 import tkinter as tk
 from tkinter import *
 from tkinter import Message ,Text
+import os
 
 window=Tk() 
 window.geometry("700x400")
 
-button1=tk.Button(window,text="ADD NEW",width=40,height=2,font=("times new roman",20),bg="red",fg='white',command="")
+def add_new():
+    os.system("python example.py")
+button1=tk.Button(window,text="ADD NEW",width=40,height=2,font=("times new roman",20),bg="red",fg='white',command=add_new)
 button1.place(x=50,y=10)
 
 button2=tk.Button(window,text="MARK ATTENDANCE",width=40,height=2,font=("times new roman",20),bg="red",fg='white',command="")
