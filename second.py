@@ -12,9 +12,7 @@ import time
 mydb=mysql.connector.connect(host="127.0.0.1",port="3306",user="root",passwd="Sarath@1998",database="student_database")
 mycursor=mydb.cursor()
 
-
 root=Tk()
-
 root.geometry("700x400")
 
 label1=tk.Label(root,text="Password",width=8,fg="white",bg="red",font=('times',20,'bold'))
@@ -110,7 +108,6 @@ def TrainImages():
     recognizer.save("ImageLabel\Trainner.yml")
     message1.configure(text="Trainning compleated")
     
-
 def getImagesAndLabels(path):
     #get the path of all the files in the folder
     imagePaths=[os.path.join(path,f) for f in os.listdir(path)] 
@@ -161,9 +158,6 @@ def delete():
         writer.writerows(data)
     f.close()
     message1.configure(text="Deleted "+Name+" "+Id)
-
-
-
 
 button1=tk.Button(root,text="Clear",command=clear,width=8,fg="white",bg="red",font=('times',20,'bold'))
 button1.place(x=500,y=200)

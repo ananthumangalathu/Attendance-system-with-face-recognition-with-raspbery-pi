@@ -7,7 +7,7 @@ window=Tk()
 window.geometry("700x400")
 
 def add_new():
-    os.system("python example.py")
+    os.system("python second.py")
 button1=tk.Button(window,text="ADD NEW",width=40,height=2,font=("times new roman",20),bg="red",fg='white',command=add_new)
 button1.place(x=50,y=10)
 
