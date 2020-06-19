@@ -8,9 +8,23 @@ import csv
 import numpy as np
 from PIL import Image, ImageTk
 import time
+import pyrebase
 
 mydb=mysql.connector.connect(host="127.0.0.1",port="3306",user="root",passwd="Sarath@1998",database="student_database")
 mycursor=mydb.cursor()
+
+config={
+    "apiKey": "AIzaSyAOtCeT6JpkIUFSbQbQ6xNp4HNjyEtnbMM",
+    "authDomain": "attendence-system-270913.firebaseapp.com",
+    "databaseURL": "https://attendence-system-270913.firebaseio.com",
+    "projectId": "attendence-system-270913",
+    "storageBucket": "attendence-system-270913.appspot.com",
+    "messagingSenderId": "861579886336",
+    "appId": "1:861579886336:web:3aeab2978154da12a37de5",
+    "measurementId": "G-QZH8G1NGT4"
+    }
+firebase=pyrebase.initialize_app(config)
+storage=firebase.storage()
 
 root=Tk()
 root.geometry("700x400")
@@ -130,9 +144,17 @@ def getImagesAndLabels(path):
         Ids.append(Id)        
     return faces,Ids
 
+def cloudupload():
+    path_on_cloud="StudentDetails/StudentDetails.csv"
+    path_local="StudentDetails\StudentDetails.csv"
+    storage.child(path_on_cloud).put(path_local)
+    message1.configure(text="Students list uploaded")
+
 def quit():
     TrainImages()
-    time.sleep(10)
+    time.sleep(3)
+    cloudupload()
+    time.sleep(3)
     root.destroy()
 
 def clear():
