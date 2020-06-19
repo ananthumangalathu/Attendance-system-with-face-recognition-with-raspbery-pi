@@ -14,6 +14,22 @@ root=Tk()
 
 root.geometry("700x400")
 
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        pass
+ 
+    try:
+        import unicodedata
+        unicodedata.numeric(s)
+        return True
+    except (TypeError, ValueError):
+        pass
+ 
+    return False
+
 def add_new():
     Id=(text2.get())
     Name=(text3.get())
