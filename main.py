@@ -53,7 +53,9 @@ def mark_attendance():
             Id, conf = recognizer.predict(gray[y:y+h,x:x+w])                                   
             if(conf < 60):  
                 aa=df.loc[df['Id'] == Id]['Name'].values
-                tt=Id,aa
+                tt=str(Id)+"-"+aa
+                mycursor.execute("SELECT Name FROM student_database WHERE Id=Id")
+                Name=mycursor.fetchone()
                 sql = "UPDATE student_database SET Status='PRESENT' where Id=Id"
                 mycursor.execute(sql)
                 mydb.commit()
@@ -63,7 +65,8 @@ def mark_attendance():
             if(conf > 75):
                 noOfFile=len(os.listdir("ImagesUnknown"))+1
                 cv.imwrite("ImagesUnknown\Image"+str(noOfFile) + ".jpg", im[y:y+h,x:x+w])            
-            cv.putText(im,str(tt),(x,y+h), font, 1,(255,255,255),2)            
+            cv.putText(im,str(Name),(x,y+h), font, 1,(255,255,255),2)
+            message1.configure(text="Attendance marked for"+str(Name)+" "+str(Id))            
         cv.imshow('im',im) 
         if (cv.waitKey(5000)):
             break
@@ -76,7 +79,7 @@ def mark_attendance():
         a.writerow(["Id","Name","Status"])  ## etc
         a.writerows(data)
     f.close()
-    message1.configure(text="Attendance marked for"+aa+" "+Id)
+    message1.configure(text="Attendance marked for"+str(Name)+" "+str(Id))    
 
 def attendancesheet():
     path_on_cloud="Attendance/ " +date+ ".csv"
@@ -85,14 +88,15 @@ def attendancesheet():
     sql = "UPDATE student_database SET Status='ABSENT' where Status=PRESENT"
     mycursor.execute(sql)
     mydb.commit()
+    message1.configure(text="Attendance sheet generated and uploaded to cloud")
 
 button1=tk.Button(window,text="ADD NEW",width=20,height=2,font=("times new roman",20),bg="red",fg='white',command=add_new)
 button1.place(x=20,y=150)
 
-button2=tk.Button(window,text="MARK ATTENDANCE",width=20,height=2,font=("times new roman",20),bg="red",fg='white',command="")
+button2=tk.Button(window,text="MARK ATTENDANCE",width=20,height=2,font=("times new roman",20),bg="red",fg='white',command=mark_attendance)
 button2.place(x=380,y=150)
 
-button3=tk.Button(window,text="ATTENDANCE SHEET",width=20,height=2,font=("times new roman",20),bg="red",fg='white',command="")
+button3=tk.Button(window,text="ATTENDANCE SHEET",width=20,height=2,font=("times new roman",20),bg="red",fg='white',command=attendancesheet)
 button3.place(x=20,y=250)
 
 button4=tk.Button(window,text="QUIT",width=20,height=2,font=("times new roman",20),bg="red",fg='white',command=window.destroy)
