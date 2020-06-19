@@ -7,6 +7,7 @@ import mysql.connector
 import csv
 import numpy as np
 from PIL import Image, ImageTk
+import time
 
 mydb=mysql.connector.connect(host="127.0.0.1",port="3306",user="root",passwd="Sarath@1998",database="student_database")
 mycursor=mydb.cursor()
@@ -15,6 +16,29 @@ mycursor=mydb.cursor()
 root=Tk()
 
 root.geometry("700x400")
+
+label1=tk.Label(root,text="Password",width=8,fg="white",bg="red",font=('times',20,'bold'))
+label1.place(x=50,y=50)
+text1=tk.Entry(root,fg="red",bg="red",font=('times',20,'bold'))
+text1.place(x=200,y=50)
+
+label2=tk.Label(root,text="Id",width=8,fg="white",bg="red",font=('times',20,'bold'))
+label2.place(x=50,y=100)
+text2=tk.Entry(root,fg="white",bg="red",font=('times',20,'bold'))
+text2.place(x=200,y=100)
+
+label3=tk.Label(root,text="Name",width=8,fg="white",bg="red",font=('times',20,'bold'))
+label3.place(x=50,y=150)
+text3=tk.Entry(root,fg="white",bg="red",font=('times',20,'bold'))
+text3.place(x=200,y=150)
+
+label4=tk.Label(root,text="Email",width=8,fg="white",bg="red",font=('times',20,'bold'))
+label4.place(x=50,y=200)
+text4=tk.Entry(root,fg="white",bg="red",font=('times',20,'bold'))
+text4.place(x=200,y=200)
+
+message1 = tk.Label(root,text="",bg="red"  ,fg="white"  ,width=30  ,height=2,font=('times', 15, ' bold '))
+message1.place(x=50,y=250)
 
 def is_number(s):
     try:
@@ -73,14 +97,14 @@ def add_new():
             writer.writerow(["Id","Name","Email"])
             writer.writerows(data)
         f.close()
-        
+        message1.configure(text= res)
     else:
         if(is_number(Id)):
             res = "Enter Alphabetical Name"
-            message.configure(text= res)
+            message1.configure(text= res)
         if(Name.isalpha()):
             res = "Enter Numeric Id"
-            message.configure(text= res)
+            message1.configure(text= res)
 
 def TrainImages():
     recognizer = cv.face_LBPHFaceRecognizer.create()#recognizer = cv2.face.LBPHFaceRecognizer_create()#$cv2.createLBPHFaceRecognizer()
@@ -90,6 +114,7 @@ def TrainImages():
     recognizer.train(faces, np.array(Id))
     recognizer.save("ImageLabel\Trainner.yml")
     res = "Image Trained"#+",".join(str(f) for f in Id)
+    message1.configure(text="Image Trained")
     
 
 def getImagesAndLabels(path):
@@ -116,37 +141,27 @@ def getImagesAndLabels(path):
 
 def quit():
     TrainImages()
+    time.sleep(10)
     root.destroy()
 
-label1=tk.Label(root,text="Password",width=8,fg="white",bg="red",font=('times',20,'bold'))
-label1.place(x=50,y=50)
-text1=tk.Entry(root,fg="red",bg="red",font=('times',20,'bold'))
-text1.place(x=200,y=50)
+def clear():
+    text2.delete(0, 'end')
+    text3.delete(0, 'end')
+    text4.delete(0, 'end')
+    
 
-label2=tk.Label(root,text="Id",width=8,fg="white",bg="red",font=('times',20,'bold'))
-label2.place(x=50,y=100)
-text2=tk.Entry(root,fg="white",bg="red",font=('times',20,'bold'))
-text2.place(x=200,y=100)
 
-label3=tk.Label(root,text="Name",width=8,fg="white",bg="red",font=('times',20,'bold'))
-label3.place(x=50,y=150)
-text3=tk.Entry(root,fg="white",bg="red",font=('times',20,'bold'))
-text3.place(x=200,y=150)
 
-label4=tk.Label(root,text="Email",width=8,fg="white",bg="red",font=('times',20,'bold'))
-label4.place(x=50,y=200)
-text4=tk.Entry(root,fg="white",bg="red",font=('times',20,'bold'))
-text4.place(x=200,y=200)
 
-button1=tk.Button(root,text="Clear",width=8,fg="white",bg="red",font=('times',20,'bold'))
-button1.place(x=500,y=50)
+button1=tk.Button(root,text="Clear",command=clear,width=8,fg="white",bg="red",font=('times',20,'bold'))
+button1.place(x=500,y=200)
 
 button2=tk.Button(root,text="Quit",command=quit,width=8,fg="white",bg="red",font=('times',20,'bold'))
-button2.place(x=500,y=150)
+button2.place(x=500,y=275)
 
 button3=tk.Button(root,text="Add New",command=add_new,width=8,fg="white",bg="red",font=('times',20,'bold'))
-button3.place(x=100,y=300)
+button3.place(x=500,y=50)
 
 button4=tk.Button(root,text="Delete",width=8,fg="white",bg="red",font=('times',20,'bold'))
-button4.place(x=400,y=300)
+button4.place(x=500,y=125)
 root.mainloop()
