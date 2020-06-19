@@ -8,10 +8,25 @@ import datetime
 import time
 import mysql.connector
 import csv
+import pyrebase
+
 mydb=mysql.connector.connect(host="127.0.0.1",port="3306",user="root",passwd="Sarath@1998",database="student_database")
 mycursor=mydb.cursor()
 
 date = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d')
+
+config={
+    "apiKey": "AIzaSyAOtCeT6JpkIUFSbQbQ6xNp4HNjyEtnbMM",
+    "authDomain": "attendence-system-270913.firebaseapp.com",
+    "databaseURL": "https://attendence-system-270913.firebaseio.com",
+    "projectId": "attendence-system-270913",
+    "storageBucket": "attendence-system-270913.appspot.com",
+    "messagingSenderId": "861579886336",
+    "appId": "1:861579886336:web:3aeab2978154da12a37de5",
+    "measurementId": "G-QZH8G1NGT4"
+    }
+firebase=pyrebase.initialize_app(config)
+storage=firebase.storage()
 
 window=Tk() 
 window.geometry("700x400")
@@ -39,7 +54,7 @@ def mark_attendance():
             if(conf < 60):  
                 aa=df.loc[df['Id'] == Id]['Name'].values
                 tt=Id,aa
-                sql = "Update student_database SET status='Present' where Id=Id"
+                sql = "UPDATE student_database SET Status='PRESENT' where Id=Id"
                 mycursor.execute(sql)
                 mydb.commit()
             else:
@@ -62,6 +77,15 @@ def mark_attendance():
         a.writerows(data)
     f.close()
     message1.configure(text="Attendance marked for"+aa+" "+Id)
+
+def attendancesheet():
+    path_on_cloud="Attendance/ " +date+ ".csv"
+    path_local="Attendance\ " +date+ ".csv"
+    storage.child(path_on_cloud).put(path_local)
+    sql = "UPDATE student_database SET Status='ABSENT' where Status=PRESENT"
+    mycursor.execute(sql)
+    mydb.commit()
+
 button1=tk.Button(window,text="ADD NEW",width=20,height=2,font=("times new roman",20),bg="red",fg='white',command=add_new)
 button1.place(x=20,y=150)
 
