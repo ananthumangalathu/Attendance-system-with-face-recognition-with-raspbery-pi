@@ -57,8 +57,10 @@ def mark_attendance():
             Id, conf = recognizer.predict(gray[y:y+h,x:x+w])                                   
             if(conf < 60):  
                 mycursor.execute("SELECT Name FROM student_database WHERE Id=Id")
-                name=mycursor.fetchone()
-                Name=''.join(name)
+                result=mycursor.fetchone()
+                Name=''.join(result)           
+                cv.putText(im,str(Name),(x,y+h), font, 1,(255,255,255),2)
+                message1.configure(text="Attendance marked for"+str(Name)+" "+str(Id))
                 mycursor.execute("UPDATE student_database SET Status='PRESENT' where Id=Id")
                 mydb.commit()
             else:
@@ -66,9 +68,7 @@ def mark_attendance():
                 tt=str(Id)  
             if(conf > 75):
                 noOfFile=len(os.listdir("ImagesUnknown"))+1
-                cv.imwrite("ImagesUnknown\Image"+str(noOfFile) + ".jpg", im[y:y+h,x:x+w])            
-            cv.putText(im,str(Name),(x,y+h), font, 1,(255,255,255),2)
-            message1.configure(text="Attendance marked for"+str(Name)+" "+str(Id))            
+                cv.imwrite("ImagesUnknown\Image"+str(noOfFile) + ".jpg", im[y:y+h,x:x+w])                        
         cv.imshow('im',im) 
         if (cv.waitKey(5000)):
             break
@@ -81,8 +81,7 @@ def mark_attendance():
         a.writerow(["Id","Name","Status"])  ## etc
         a.writerows(data)
     f.close()
-    message1.configure(text="Attendance marked for"+str(Name)+" "+str(Id))    
-
+        
 def attendancesheet():
     path_on_cloud="Attendance/ " +date+ ".csv"
     path_local="Attendance\ " +date+ ".csv"
