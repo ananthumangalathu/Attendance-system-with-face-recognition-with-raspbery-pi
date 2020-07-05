@@ -11,7 +11,7 @@ import time
 import pyrebase
 
 mydb=mysql.connector.connect(host="192.168.56.1",port="3306",user="sarath",passwd="NJANADA@008",database="student_database")
-mycursor=mydb.cursor()
+mycursor=mydb.cursor(buffered=True)
 
 config={
     "apiKey": "AIzaSyAOtCeT6JpkIUFSbQbQ6xNp4HNjyEtnbMM",
