@@ -165,7 +165,8 @@ def clear():
 def delete():
     Id=(text2.get())
     mycursor.execute("SELECT name FROM student_database WHERE Id=Id")
-    Name=mycursor.fetchone()
+    name=mycursor.fetchone()
+    Name=''.join(name)
     samplenum=1
     while (samplenum<=61):
         os.remove("Images/ "+str(Name) +"."+Id +'.'+ str(samplenum) + ".jpg")
