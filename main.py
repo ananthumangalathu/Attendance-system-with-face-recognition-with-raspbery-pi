@@ -9,8 +9,12 @@ import time
 import mysql.connector
 import csv
 import pyrebase
+import yagmail
 
-mydb=mysql.connector.connect(host="127.0.0.1",port="3306",user="root",passwd="Sarath@1998",database="student_database")
+yagmail.register("classattendance27@gmail.com","attendance@geck")
+yag=yagmail.SMTP("classattendance27@gmail.com")
+
+mydb=mysql.connector.connect(host="192.168.56.1",port="3306",user="sarath",passwd="NJANADA@008",database="student_database")
 mycursor=mydb.cursor()
 
 date = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d')
@@ -72,7 +76,7 @@ def mark_attendance():
             break
         cam.release()
     cv.destroyAllWindows()
-    mycursor.execute("SELECT * FROM student_database")
+    mycursor.execute("SELECT Id,Name,Status FROM student_database")
     data=mycursor.fetchall()
     with open("Attendance\ " +date+ ".csv",'w') as f:
         a = csv.writer(f, delimiter=',')
@@ -85,6 +89,11 @@ def attendancesheet():
     path_on_cloud="Attendance/ " +date+ ".csv"
     path_local="Attendance\ " +date+ ".csv"
     storage.child(path_on_cloud).put(path_local)
+    mycursor.execute("SELECT Name,Email FROM student_database WHERE Status='ABSENT'")
+    result=mycursor.fetchall()
+    for Name,Email in result:
+        content=['Your child '+str(Name)+' was absent today']
+        yag.send(Email,'absent',content)
     sql = "UPDATE student_database SET Status='ABSENT' where Status=PRESENT"
     mycursor.execute(sql)
     mydb.commit()
