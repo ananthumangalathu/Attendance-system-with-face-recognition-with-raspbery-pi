@@ -10,7 +10,7 @@ from PIL import Image, ImageTk
 import time
 import pyrebase
 
-mydb=mysql.connector.connect(host="127.0.0.1",port="3306",user="root",passwd="Sarath@1998",database="student_database")
+mydb=mysql.connector.connect(host="192.168.56.1",port="3306",user="sarath",passwd="NJANADA@008",database="student_database")
 mycursor=mydb.cursor()
 
 config={
@@ -164,10 +164,11 @@ def clear():
     
 def delete():
     Id=(text2.get())
-    Name=(text3.get())
+    mycursor.execute("SELECT name FROM student_database WHERE Id=Id")
+    Name=mycursor.fetchone()
     samplenum=1
     while (samplenum<=61):
-        os.remove("Images/ "+Name +"."+Id +'.'+ str(samplenum) + ".jpg")
+        os.remove("Images/ "+str(Name) +"."+Id +'.'+ str(samplenum) + ".jpg")
         samplenum=samplenum+1
     sql = "DELETE FROM student_database WHERE Id=Id"
     mycursor.execute(sql)
