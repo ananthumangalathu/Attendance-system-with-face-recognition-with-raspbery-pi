@@ -11,7 +11,7 @@ import time
 import pyrebase
 
 mydb=mysql.connector.connect(host="192.168.56.1",port="3306",user="sarath",passwd="NJANADA@008",database="student_database")
-mycursor=mydb.cursor()
+mycursor=mydb.cursor(buffered=True)
 
 config={
     "apiKey": "AIzaSyAOtCeT6JpkIUFSbQbQ6xNp4HNjyEtnbMM",
@@ -99,7 +99,7 @@ def add_new():
         sql="INSERT INTO student_database (Id,Name,Email) VALUES (%s,%s,%s)"
         mycursor.execute(sql,row)
         mydb.commit()
-        mycursor.execute("SELECT * FROM student_database")
+        mycursor.execute("SELECT Id,Name,Email FROM student_database")
         data=mycursor.fetchall()
         with open('StudentDetails\StudentDetails.csv','w') as f:
             writer = csv.writer(f, delimiter=',')
@@ -174,7 +174,7 @@ def delete():
     sql = "DELETE FROM student_database WHERE Id=Id"
     mycursor.execute(sql)
     mydb.commit()
-    mycursor.execute("SELECT * FROM student_database")
+    mycursor.execute("SELECT Id,Name,Email FROM student_database")
     data=mycursor.fetchall()
     with open('StudentDetails\StudentDetails.csv','w') as f:
         writer = csv.writer(f, delimiter=',')
