@@ -15,7 +15,7 @@ yagmail.register("classattendance27@gmail.com","attendance@geck")
 yag=yagmail.SMTP("classattendance27@gmail.com")
 
 mydb=mysql.connector.connect(host="192.168.56.1",port="3306",user="sarath",passwd="NJANADA@008",database="student_database")
-mycursor=mydb.cursor()
+mycursor=mydb.cursor(buffered=True)
 
 date = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d')
 
@@ -56,12 +56,10 @@ def mark_attendance():
             cv.rectangle(im,(x,y),(x+w,y+h),(225,0,0),2)
             Id, conf = recognizer.predict(gray[y:y+h,x:x+w])                                   
             if(conf < 60):  
-                aa=df.loc[df['Id'] == Id]['Name'].values
-                tt=str(Id)+"-"+aa
                 mycursor.execute("SELECT Name FROM student_database WHERE Id=Id")
-                Name=mycursor.fetchone()
-                sql = "UPDATE student_database SET Status='PRESENT' where Id=Id"
-                mycursor.execute(sql)
+                name=mycursor.fetchone()
+                Name=''.join(name)
+                mycursor.execute("UPDATE student_database SET Status='PRESENT' where Id=Id")
                 mydb.commit()
             else:
                 Id='Unknown'                
@@ -94,7 +92,7 @@ def attendancesheet():
     for Name,Email in result:
         content=['Your child '+str(Name)+' was absent today']
         yag.send(Email,'absent',content)
-    sql = "UPDATE student_database SET Status='ABSENT' where Status=PRESENT"
+    sql = "UPDATE student_database SET Status='ABSENT' where Status='PRESENT'"
     mycursor.execute(sql)
     mydb.commit()
     message1.configure(text="Attendance sheet generated and uploaded to cloud")
