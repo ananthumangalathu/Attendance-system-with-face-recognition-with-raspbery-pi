@@ -14,7 +14,7 @@ import yagmail
 yagmail.register("classattendance27@gmail.com","attendance@geck")
 yag=yagmail.SMTP("classattendance27@gmail.com")
 
-mydb=mysql.connector.connect(host="192.168.56.1",port="3306",user="sarath",passwd="NJANADA@008",database="student_database")
+mydb=mysql.connector.connect(host="localhost",user="root",passwd="Sarath@1998",database="student_database")
 mycursor=mydb.cursor(buffered=True)
 
 date = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d')
@@ -34,11 +34,24 @@ storage=firebase.storage()
 
 window=Tk() 
 window.geometry("700x400")
+window.title("Attendance System")
 
 message1 = tk.Label(window,text="",bg="red"  ,fg="white"  ,width=50  ,height=4,font=('times', 15, ' bold '))
 message1.place(x=50,y=20)
 def add_new():
     os.system("python second.py")
+
+def convert(s): 
+  
+    # initialization of string to "" 
+    new = "" 
+  
+    # traverse in the string  
+    for x in s: 
+        new += x  
+  
+    # return string  
+    return new
 
 def mark_attendance():
     recognizer = cv.face.LBPHFaceRecognizer_create()#cv2.createLBPHFaceRecognizer()
@@ -47,8 +60,8 @@ def mark_attendance():
     faceCascade = cv.CascadeClassifier(harcascadePath);    
     df=pd.read_csv("StudentDetails\StudentDetails.csv")
     cam = cv.VideoCapture(0)
-    font = cv.FONT_HERSHEY_SIMPLEX           
-    while True:
+    font = cv.FONT_HERSHEY_SIMPLEX          
+    while(True):
         ret, im =cam.read()
         gray=cv.cvtColor(im,cv.COLOR_BGR2GRAY)
         faces=faceCascade.detectMultiScale(gray, 1.2,5)    
@@ -56,12 +69,12 @@ def mark_attendance():
             cv.rectangle(im,(x,y),(x+w,y+h),(225,0,0),2)
             Id, conf = recognizer.predict(gray[y:y+h,x:x+w])                                   
             if(conf < 60):  
-                mycursor.execute("SELECT Name FROM student_database WHERE Id=Id")
+                mycursor.execute("SELECT Name FROM mydata WHERE Id='"+str(Id)+"'")
                 result=mycursor.fetchone()
-                Name=''.join(result)           
+                Name=convert(result)           
                 cv.putText(im,str(Name),(x,y+h), font, 1,(255,255,255),2)
                 message1.configure(text="Attendance marked for"+str(Name)+" "+str(Id))
-                mycursor.execute("UPDATE student_database SET Status='PRESENT' where Id=Id")
+                mycursor.execute("UPDATE mydata SET Status='PRESENT' where Id='"+str(Id)+"'")
                 mydb.commit()
             else:
                 Id='Unknown'                
@@ -69,12 +82,12 @@ def mark_attendance():
             if(conf > 75):
                 noOfFile=len(os.listdir("ImagesUnknown"))+1
                 cv.imwrite("ImagesUnknown\Image"+str(noOfFile) + ".jpg", im[y:y+h,x:x+w])                        
-        cv.imshow('im',im) 
-        if (cv.waitKey(5000)):
-            break
+        cv.imshow('image',im) 
+        if cv.waitKey(100) & 0xFF == ord('q'):
+                break
         cam.release()
     cv.destroyAllWindows()
-    mycursor.execute("SELECT Id,Name,Status FROM student_database")
+    mycursor.execute("SELECT Id,Name,Status FROM mydata")
     data=mycursor.fetchall()
     with open("Attendance\ " +date+ ".csv",'w') as f:
         a = csv.writer(f, delimiter=',')
@@ -83,15 +96,22 @@ def mark_attendance():
     f.close()
         
 def attendancesheet():
+    mycursor.execute("SELECT Id,Name,Status FROM mydata")
+    data=mycursor.fetchall()
+    with open("Attendance\ " +date+ ".csv",'w') as f:
+        a = csv.writer(f, delimiter=',')
+        a.writerow(["Id","Name","Status"])  ## etc
+        a.writerows(data)
+    f.close()
     path_on_cloud="Attendance/ " +date+ ".csv"
     path_local="Attendance\ " +date+ ".csv"
     storage.child(path_on_cloud).put(path_local)
-    mycursor.execute("SELECT Name,Email FROM student_database WHERE Status='ABSENT'")
+    mycursor.execute("SELECT Name,Email FROM mydata WHERE Status='ABSENT'")
     result=mycursor.fetchall()
     for Name,Email in result:
         content=['Your child '+str(Name)+' was absent today']
         yag.send(Email,'absent',content)
-    sql = "UPDATE student_database SET Status='ABSENT' where Status='PRESENT'"
+    sql = "UPDATE mydata SET Status='ABSENT' where Status='PRESENT'"
     mycursor.execute(sql)
     mydb.commit()
     message1.configure(text="Attendance sheet generated and uploaded to cloud")

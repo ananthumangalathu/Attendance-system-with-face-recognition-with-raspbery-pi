@@ -10,7 +10,7 @@ from PIL import Image, ImageTk
 import time
 import pyrebase
 
-mydb=mysql.connector.connect(host="192.168.56.1",port="3306",user="sarath",passwd="NJANADA@008",database="student_database")
+mydb=mysql.connector.connect(host="localhost",user="root",passwd="Sarath@1998",database="student_database")
 mycursor=mydb.cursor(buffered=True)
 
 config={
@@ -28,6 +28,7 @@ storage=firebase.storage()
 
 root=Tk()
 root.geometry("700x400")
+root.title("Add New")
 
 label1=tk.Label(root,text="Password",width=8,fg="white",bg="red",font=('times',20,'bold'))
 label1.place(x=50,y=50)
@@ -95,11 +96,13 @@ def add_new():
                 break
         cam.release()
         cv.destroyAllWindows() 
-        row = (Id, Name,Email)
-        sql="INSERT INTO student_database (Id,Name,Email) VALUES (%s,%s,%s)"
+        row = (Id,Name,Email)
+        sql="INSERT INTO mydata (Id,Name,Email) VALUES (%s,%s,%s)"
         mycursor.execute(sql,row)
         mydb.commit()
-        mycursor.execute("SELECT Id,Name,Email FROM student_database")
+        mycursor.execute("UPDATE mydata SET Status='ABSENT' where Id='"+Id+"'")
+        mydb.commit()
+        mycursor.execute("SELECT Id,Name,Email FROM mydata")
         data=mycursor.fetchall()
         with open('StudentDetails\StudentDetails.csv','w') as f:
             writer = csv.writer(f, delimiter=',')
@@ -152,9 +155,7 @@ def cloudupload():
 
 def quit():
     TrainImages()
-    time.sleep(3)
     cloudupload()
-    time.sleep(3)
     root.destroy()
 
 def clear():
@@ -162,19 +163,31 @@ def clear():
     text3.delete(0, 'end')
     text4.delete(0, 'end')
     
+def convert(s): 
+  
+    # initialization of string to "" 
+    new = "" 
+  
+    # traverse in the string  
+    for x in s: 
+        new += x  
+  
+    # return string  
+    return new
+
 def delete():
     Id=(text2.get())
-    mycursor.execute("SELECT name FROM student_database WHERE Id=Id")
-    name=mycursor.fetchone()
-    Name=''.join(name)
+    mycursor.execute("SELECT Name FROM mydata WHERE Id='"+Id+"'")
+    result=mycursor.fetchone()
+    Name=convert(result)
     samplenum=1
     while (samplenum<=61):
-        os.remove("Images/ "+str(Name) +"."+Id +'.'+ str(samplenum) + ".jpg")
+        os.remove("Images/ "+Name +"."+Id +'.'+ str(samplenum) + ".jpg")
         samplenum=samplenum+1
-    sql = "DELETE FROM student_database WHERE Id=Id"
+    sql = "DELETE FROM mydata WHERE Id='"+Id+"'"
     mycursor.execute(sql)
     mydb.commit()
-    mycursor.execute("SELECT Id,Name,Email FROM student_database")
+    mycursor.execute("SELECT Id,Name,Email FROM mydata")
     data=mycursor.fetchall()
     with open('StudentDetails\StudentDetails.csv','w') as f:
         writer = csv.writer(f, delimiter=',')
