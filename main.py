@@ -1,3 +1,6 @@
+# Create gmail id, mysql database,Google firebase storage
+# student_database- database name
+# mydata- Table
 import tkinter as tk
 from tkinter import *
 from tkinter import Message ,Text
@@ -11,24 +14,15 @@ import csv
 import pyrebase
 import yagmail
 
-yagmail.register("classattendance27@gmail.com","attendance@geck")
-yag=yagmail.SMTP("classattendance27@gmail.com")
+yagmail.register("Gmail Id","Password")
+yag=yagmail.SMTP("Gmail Id")
 
-mydb=mysql.connector.connect(host="localhost",user="root",passwd="Sarath@1998",database="student_database")
+mydb=mysql.connector.connect(host="Your host",user="Your User",passwd="Your Password",database="student_database")
 mycursor=mydb.cursor(buffered=True)
 
 date = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d')
 
-config={
-    "apiKey": "AIzaSyAOtCeT6JpkIUFSbQbQ6xNp4HNjyEtnbMM",
-    "authDomain": "attendence-system-270913.firebaseapp.com",
-    "databaseURL": "https://attendence-system-270913.firebaseio.com",
-    "projectId": "attendence-system-270913",
-    "storageBucket": "attendence-system-270913.appspot.com",
-    "messagingSenderId": "861579886336",
-    "appId": "1:861579886336:web:3aeab2978154da12a37de5",
-    "measurementId": "G-QZH8G1NGT4"
-    }
+config={"Google firebase connection key"}
 firebase=pyrebase.initialize_app(config)
 storage=firebase.storage()
 
