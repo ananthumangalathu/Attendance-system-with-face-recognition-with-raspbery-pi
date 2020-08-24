@@ -3,13 +3,13 @@ This is a project about attendance system using face recognition using raspberry
 
 install
 
-python
-opencv
-tkinter
-yagmail
-pyrebase
-numpy
-mysql.connector
+python,
+opencv,
+tkinter,
+yagmail,
+pyrebase,
+numpy,
+mysql.connector,
 
 setup mysql database and table
 
